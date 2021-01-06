@@ -1,0 +1,35 @@
+{
+    // 使用 IntelliSense 以得知可用的屬性。
+    // 暫留以檢視現有屬性的描述。
+    // 如需詳細資訊，請瀏覽: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+        },
+        {
+            "name": "(gdb) Launch",  // 配置名称，将会在启动配置的下拉菜单中显示  
+            "type": "cppdbg",   // 配置类型，这里只能为cppdbg
+            "request": "launch",    // 请求配置类型，可以为launch（启动）或attach（附加）
+            "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",   // 将要进行调试的程序的路径   
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",    // 调试程序时的工作目录，一般为${workspaceFolder}即代码所在目录  
+            "environment": [],
+            "externalConsole": false,   // 调试时是否显示控制台窗口，一般设置为true显示控制台  
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "啟用 gdb 的美化顯示",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++: g++.exe build active file"
+        }
+    ]
+}
