@@ -9,24 +9,34 @@ from bs4 import BeautifulSoup  # Scrape data from an HTML document
 # my account key
 GENIUS_API_TOKEN = '95N_UrNaiFgPcGn_IdlVO1MX7Y-Fn4tpLKLWVmJMGh0h06T1teuNhqZkcSiAsbvn'
 
-# Error !!! AttributeError: 'NoneType' object has no attribute 'get_text' => 注意前面空格，馬的
-
-
+# Error !!! 
+# AttributeError: 'NoneType' object has no attribute 'get_text' => 注意前面空格，馬的
+#lyric = html.find("div", class_='Lyrics')
 def scrape_song_lyrics(url):
     page = requests.get(url)
-    html = BeautifulSoup(page.text, 'html.parser')
-    lyric = html.find("div", class_='lyrics').get_text()
-    lyric = re.sub(r'[\(\[].*?[\)\]]', '', lyric)  # remove identifiers like chorus, verse, etc
-    lyric = os.linesep.join([s for s in lyric.splitlines() if s]) # remove empty lines
-    return lyric
+
+    html = BeautifulSoup(page.text, "html.parser")
+
+    lyrics = html.find('div', class_='lyrics').get_text()
+
+    lyrics = re.sub(r'[\(\[].*?[\)\]]', '', lyrics)  # remove identifiers like chorus, verse, etc
+    
+    lyrics = os.linesep.join([s for s in lyrics.splitlines() if s]) # remove empty lines
+    
+    return lyrics
 
 
 def write_lyrics_to_file(url, singer, song):
     page = requests.get(url)
+    
     html = BeautifulSoup(page.text, 'html.parser')
+    
     lyric = html.find('div', class_='lyrics').get_text()
+    
     f = open((singer + ' ' + song).lower() + '.txt', 'wb+')
+    
     f.write(lyric.encode("utf8"))
+    
     f.close()
 
 

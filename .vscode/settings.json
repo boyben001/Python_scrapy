@@ -3,8 +3,6 @@
     "editor.fontFamily": "'Fira Code', 'Source Code Pro', Consolas, 'Microsoft JhengHei'",
   // 開啟連字符號
     "editor.fontLigatures": true,
-  // 主題
-    "workbench.colorTheme": "One Dark Pro",
   // icon
     "workbench.iconTheme": "vscode-icons",
     "files.associations": {
