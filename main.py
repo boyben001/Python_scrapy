@@ -4,49 +4,10 @@ import requests  # Make HTTP requests
 from bs4 import BeautifulSoup  # Scrape data from an HTML document
 
 # def scrape_song_lyrics(url) =>  Scrape lyrics from a Genius.com song URL
-# def request_song_url(artist_name, song_cap) =>  Get Genius.com song url's from artist object
-# def request_artist_info(artist_name, page) =>  Get artist object from Genius API
 # def write_lyrics_to_file(artist_name, song_count)  =>  Loop through all URL’s and write lyrics to one file
 
 # my account key
 GENIUS_API_TOKEN = '95N_UrNaiFgPcGn_IdlVO1MX7Y-Fn4tpLKLWVmJMGh0h06T1teuNhqZkcSiAsbvn'
-
-
-def request_artist_info(artist_name, page):
-    base_url = 'https://api.genius.com'
-    headers = {'Authorization': 'Bearer ' + GENIUS_API_TOKEN}
-    search_url = base_url + '/search?per_page=10&page=' + str(page)
-    data = {'q': artist_name}
-    response = requests.get(search_url, data=data, headers=headers)
-    return response
-
-
-def request_song_url(artist_name, song_cap):
-    page = 1
-    songs = []
-
-    while True:
-        response = request_artist_info(artist_name, page)
-        json = response.json()
-        # Collect up to song_cap song objects from artist
-        song_info = []
-        for hit in json['response']['hits']:
-            if artist_name.lower() in hit['result']['primary_artist']['name'].lower():
-                song_info.append(hit)
-
-        # Collect song URL's from song objects
-        for song in song_info:
-            if (len(songs) < song_cap):
-                url = song['result']['url']
-                songs.append(url)
-
-        if (len(songs) == song_cap):
-            break
-        else:
-            page += 1
-
-    print('Found {} songs by {}'.format(len(songs), artist_name))
-    return songs
 
 # Error !!! AttributeError: 'NoneType' object has no attribute 'get_text' => 注意前面空格，馬的
 
@@ -54,31 +15,43 @@ def request_song_url(artist_name, song_cap):
 def scrape_song_lyrics(url):
     page = requests.get(url)
     html = BeautifulSoup(page.text, 'html.parser')
-    lyrics = html.find('div', class_='lyrics').get_text()
-    # remove identifiers like chorus, verse, etc
-    lyrics = re.sub(r'[\(\[].*?[\)\]]', '', lyrics)
-    # remove empty lines
-    lyrics = os.linesep.join([s for s in lyrics.splitlines() if s])
-    return lyrics
+    lyric = html.find("div", class_='lyrics').get_text()
+    lyric = re.sub(r'[\(\[].*?[\)\]]', '', lyric)  # remove identifiers like chorus, verse, etc
+    lyric = os.linesep.join([s for s in lyric.splitlines() if s]) # remove empty lines
+    return lyric
 
 
-def write_lyrics_to_file(artist_name, song_count):
-    f = open(artist_name.lower() + '.txt', 'w+')
-    urls = request_song_url(artist_name, song_count)
-    for url in urls:
-        lyrics = scrape_song_lyrics(url)
-        f.write(lyrics.encode("utf8"))
+def write_lyrics_to_file(url, singer, song):
+    page = requests.get(url)
+    html = BeautifulSoup(page.text, 'html.parser')
+    lyric = html.find('div', class_='lyrics').get_text()
+    f = open((singer + ' ' + song).lower() + '.txt', 'wb+')
+    f.write(lyric.encode("utf8"))
     f.close()
-    num_lines = sum(1 for line in open(
-        artist_name.lower() + '.txt', 'r'))
-    print('Wrote {} lines to file from {} songs'.format(num_lines, song_count))
 
 
-# DEMO
-#write_lyrics_to_file('Charlie Puth', 10)
+print("請問要查哪位歌手的歌曲 : ", end='')
+singer = input(str())
+print("請問要找" + singer + "的哪首歌曲 : ", end='')
+song = input(str())
+search = singer + ' ' + song
+searchflie = search.lower()
+search = search.replace(' ', '-')
+print("\n即將顯示出歌詞 . . . 請稍等 . . .\n")
+print(scrape_song_lyrics('https://genius.com/' + search + '-lyrics'))
+print('\n\n')
+url = 'https://genius.com/' + search + '-lyrics'
 
-# DEMO
-print(scrape_song_lyrics('https://genius.com/Charlie-Puth-Attention-lyrics'))
+filepath = "C:/Users/陳鼎元/Desktop/Python_scrapy/" + searchflie + '.txt'
+if os.path.isfile(filepath):
+    print("此歌詞檔已經存過了哦 ~~~")
+else:
+    print("歌詞檔不存在")
+    print("\n想要將此歌手的歌詞存檔嗎???  回應(好或不要) : ", end='')
+    write = input(str())
+    if (write == "好"):
+        write_lyrics_to_file(url, singer, song)
+        print("\n恭喜 !!! 此歌詞已經存好囉 !!!")
 
-# DEMO
-request_song_url('Charlie Puth', 2)
+
+
